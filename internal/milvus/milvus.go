@@ -115,6 +115,23 @@ func (m *MilvusOperator) Insert(ctx context.Context, questions []string, embeddi
 	return
 }
 
+// 更新索引
+func (m *MilvusOperator) Update(ctx context.Context, ids []int64, questions []string, embeddings [][]float32) (newIds []int64, err error) {
+	// 先删除
+	err = m.c.DeleteByPks(ctx, CollectionName, "", entity.NewColumnInt64(idCol, ids))
+	if err != nil {
+		return nil, err
+	}
+	// 插入数据
+	return m.Insert(ctx, questions, embeddings)
+}
+
+// 删除
+func (m *MilvusOperator) Delete(ctx context.Context, ids []int64) error {
+	// 先删除
+	return m.c.DeleteByPks(ctx, CollectionName, "", entity.NewColumnInt64(idCol, ids))
+}
+
 // 查询结果
 type SearchResult struct {
 	Id    int64
